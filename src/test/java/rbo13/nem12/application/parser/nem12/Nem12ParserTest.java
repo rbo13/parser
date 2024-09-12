@@ -62,4 +62,39 @@ public class Nem12ParserTest {
                 readings.get(47)
         );
     }
+
+    @Test
+    void testItYieldsCorrectValuesForLast300Record() throws Exception {
+        Parser parser = new Nem12Parser();
+        List<MeterReading> meterReadings = parser.parse(new File("meter_readings.csv")).stream().toList();
+
+        // Get the readings from the last `300` record
+        List<MeterReading> readings = meterReadings.subList(meterReadings.size() - 48, meterReadings.size());
+
+        // Asserting values for specific records
+        assertEquals(
+                new MeterReading(
+                        "NEM1201010",
+                        LocalDateTime.of(2005, 3, 4, 0, 30),
+                        BigDecimal.ZERO
+                ),
+                readings.getFirst()
+        );
+        assertEquals(
+                new MeterReading(
+                        "NEM1201010",
+                        LocalDateTime.of(2005, 3, 4, 7, 0),
+                        new BigDecimal("0.415")
+                ),
+                readings.get(13)
+        );
+        assertEquals(
+                new MeterReading(
+                        "NEM1201010",
+                        LocalDateTime.of(2005, 3, 5, 0, 0),
+                        new BigDecimal("0.355")
+                ),
+                readings.get(47)
+        );
+    }
 }
