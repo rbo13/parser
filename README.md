@@ -14,6 +14,7 @@ Here are the dependencies used for this project:
 1. Spring Boot
 2. Flyway
 3. PostgreSQL Client Library
+4. HikariCP
 
 ## Cloning the repo
 ```git
@@ -24,17 +25,29 @@ cd parser
 ## Get the postgresql image via docker compose:
 ```shell
 # compose.yaml
-docker compose up --build
+docker compose up --build -d
 ```
 
 ## Running tests:
 ```shell
+# on linux or mac
 ./mvnw clean test
+
+# on windows (using Powershell)
+.\mvnw clean test
 ```
 
 ## Running the application:
 ```shell
+# on linux or mac
 ./mvnw clean install
-
 java -jar ./target/parser-0.0.1-SNAPSHOT.jar ./meter_readings.csv
+
+# on windows (using Powershell)
+.\mvnw clean install
+java -jar .\target\parser-0.0.1-SNAPSHOT.jar .\meter_readings.csv
 ```
+
+## Conclusion:
+If all is up and running, you should be able to see this log statements being printed on your terminal.
+![image](https://github.com/user-attachments/assets/b8723994-c5ba-4722-8a71-aca9dc6cc32b)
