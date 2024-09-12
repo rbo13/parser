@@ -6,26 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import rbo13.nem12.application.parser.Parser;
+import rbo13.nem12.application.model.MeterReading;
+import rbo13.nem12.application.repository.jdbc.MeterReadingJDBCRepository;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class MeterReadingServiceTest {
 
     @Mock
-    private DataSource dataSource;
-
-    @Mock
-    private Connection connection;
-
-    @Mock
-    private PreparedStatement preparedStatement;
+    private MeterReadingJDBCRepository repository;
 
     @InjectMocks
     private MeterReadingService meterReadingService;
@@ -35,8 +27,6 @@ public class MeterReadingServiceTest {
     @BeforeEach
     void setup() throws Exception {
         closeable = MockitoAnnotations.openMocks(this);
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
     }
 
     @AfterEach
@@ -46,15 +36,9 @@ public class MeterReadingServiceTest {
 
     @Test
     public void testInsertStatement() throws Exception {
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.prepareStatement("INSERT INTO meter_readings (nmi, timestamp, consumption) VALUES (?, ?, ?);")).thenAnswer(invocation -> {
-            String sql = invocation.getArgument(0);
-            assertEquals("INSERT INTO meter_readings (nmi, timestamp, consumption) VALUES (?, ?, ?);", sql);
-            return preparedStatement;
-        });
-
-        meterReadingService.process("./meter_readings.csv");
-
-        verify(connection).prepareStatement("INSERT INTO meter_readings (nmi, timestamp, consumption) VALUES (?, ?, ?);");
+        MeterReading reading = new MeterReading("NMI123", LocalDateTime.now(), new BigDecimal("123.45"));
+        List<MeterReading> readings = List.of(reading);
+        meterReadingService.saveAll(readings);
+        verify(repository, times(1)).batchInsert(readings);
     }
 }

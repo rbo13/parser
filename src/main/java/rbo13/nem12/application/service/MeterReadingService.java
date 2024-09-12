@@ -5,22 +5,19 @@ import org.springframework.stereotype.Service;
 import rbo13.nem12.application.model.MeterReading;
 import rbo13.nem12.application.parser.Parser;
 import rbo13.nem12.application.parser.nem12.Nem12Parser;
-
-import javax.sql.DataSource;
+import rbo13.nem12.application.repository.jdbc.MeterReadingJDBCRepository;
 import java.io.File;
-import java.sql.*;
 import java.util.List;
 
 @Service
 public class MeterReadingService {
 
-    private final DataSource dataSource;
+    private final MeterReadingJDBCRepository repository;
     private final Parser parser;
-    private static final String INSERT_STATEMENT = "INSERT INTO meter_readings (nmi, timestamp, consumption) VALUES (?, ?, ?);";
 
     @Autowired
-    public MeterReadingService(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public MeterReadingService(MeterReadingJDBCRepository repository) {
+        this.repository = repository;
         this.parser = new Nem12Parser();
     }
 
@@ -31,24 +28,7 @@ public class MeterReadingService {
         saveAll(readings);
     }
 
-    private void saveAll(List<MeterReading> readings) {
-        try (Connection conn = dataSource.getConnection()) {
-            PreparedStatement preparedStatement = conn.prepareStatement(INSERT_STATEMENT);
-            readings.forEach(reading -> {
-                System.out.println(preparedStatement.toString());
-                try {
-                    preparedStatement.setString(1, reading.getNmi());
-                    preparedStatement.setTimestamp(2, Timestamp.valueOf(reading.getTimestamp()));
-                    preparedStatement.setBigDecimal(3, reading.getConsumption());
-                    preparedStatement.addBatch();
-                } catch (SQLException e) {
-                    System.out.println("Prepared Statement Error: " + e.getMessage());
-                }
-            });
-
-            preparedStatement.executeBatch();
-        } catch (SQLException ex) {
-            System.out.println("SQL Error: " + ex.getMessage());
-        }
+    public void saveAll(List<MeterReading> readings) {
+        repository.batchInsert(readings);
     }
 }
