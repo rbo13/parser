@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>rbo13.nem12</groupId>
-	<artifactId>application</artifactId>
+	<artifactId>parser</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>application</name>
-	<description>Demo project for Spring Boot</description>
+	<name>parser</name>
+	<description>Parser application</description>
 	<url/>
 	<licenses>
 		<license/>
